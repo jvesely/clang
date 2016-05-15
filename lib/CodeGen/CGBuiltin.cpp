@@ -320,6 +320,33 @@ static Value *emitFPIntBuiltin(CodeGenFunction &CGF,
   return CGF.Builder.CreateCall(F, {Src0, Src1});
 }
 
+static Value *emitSelectBuiltin(CodeGenFunction &CGF,
+                                const CallExpr *E,
+                                ArrayRef<Value*> Values,
+                                Value *Default) {
+  llvm::Value *Src0 = CGF.EmitScalarExpr(E->getArg(0));
+  llvm::Value *Limit = ConstantInt::get(llvm::Type::getInt32Ty(CGF.Builder.getContext()), Values.size());
+  llvm::Value *Vector =
+    llvm::UndefValue::get(llvm::VectorType::get(Values[0]->getType(), Values.size()));
+
+  for (unsigned i = 0, e = Values.size(); i != e; ++i)
+    Vector = CGF.Builder.CreateInsertElement(Vector, Values[i], i);
+
+  llvm::Value *Element = CGF.Builder.CreateExtractElement(Vector, Src0);
+  llvm::Value *Valid = CGF.Builder.CreateICmpULT(Src0, Limit);
+  return CGF.Builder.CreateSelect(Valid, Element, Default);
+}
+
+static Value *emitSelectBuiltinCalls(CodeGenFunction &CGF,
+                                     const CallExpr *E,
+                                     ArrayRef<Value*> Values,
+                                     Value *Default) {
+  SmallVector<Value *, 3> Calls;
+  for (const auto &V: Values)
+    Calls.push_back(CGF.Builder.CreateCall(V));
+  return emitSelectBuiltin(CGF, E, Calls, Default);
+}
+
 namespace {
   struct WidthAndSignedness {
     unsigned Width;
@@ -7375,6 +7402,92 @@ Value *CodeGenFunction::EmitAMDGPUBuiltinExpr(unsigned BuiltinID,
     if (getTarget().getTriple().getArch() == Triple::amdgcn)
       return emitFPIntBuiltin(*this, E, Intrinsic::amdgcn_ldexp);
     return emitFPIntBuiltin(*this, E, Intrinsic::AMDGPU_ldexp);
+  }
+
+  // Generic OpenCL Builtins
+  case Builtin::BI__builtin_get_work_dim: {
+    Value *F;
+    if (getTarget().getTriple().getArch() == Triple::amdgcn) {
+      F = CGM.getIntrinsic(Intrinsic::amdgcn_read_workdim);
+    } else {
+      F = CGM.getIntrinsic(Intrinsic::r600_read_workdim);
+    }
+    return Builder.CreateCall(F);
+  }
+  case Builtin::BI__builtin_get_num_groups: {
+    Value *X, *Y, *Z;
+    if (getTarget().getTriple().getArch() == Triple::amdgcn) {
+    //TODO: Switch these to amdgcn when available
+      X = CGM.getIntrinsic(Intrinsic::r600_read_ngroups_x);
+      Y = CGM.getIntrinsic(Intrinsic::r600_read_ngroups_y);
+      Z = CGM.getIntrinsic(Intrinsic::r600_read_ngroups_z);
+    } else {
+      X = CGM.getIntrinsic(Intrinsic::r600_read_ngroups_x);
+      Y = CGM.getIntrinsic(Intrinsic::r600_read_ngroups_y);
+      Z = CGM.getIntrinsic(Intrinsic::r600_read_ngroups_z);
+    }
+    Value *Default = ConstantInt::get(llvm::Type::getInt32Ty(Builder.getContext()), 1);
+    return emitSelectBuiltinCalls(*this, E, {X, Y, Z}, Default);
+  }
+  case Builtin::BI__builtin_get_global_size: {
+    Value *X, *Y, *Z;
+    if (getTarget().getTriple().getArch() == Triple::amdgcn) {
+    //TODO: Switch these to amdgcn when available
+      X = CGM.getIntrinsic(Intrinsic::r600_read_global_size_x);
+      Y = CGM.getIntrinsic(Intrinsic::r600_read_global_size_y);
+      Z = CGM.getIntrinsic(Intrinsic::r600_read_global_size_z);
+    } else {
+      X = CGM.getIntrinsic(Intrinsic::r600_read_global_size_x);
+      Y = CGM.getIntrinsic(Intrinsic::r600_read_global_size_y);
+      Z = CGM.getIntrinsic(Intrinsic::r600_read_global_size_z);
+    }
+    Value *Default = ConstantInt::get(llvm::Type::getInt32Ty(Builder.getContext()), 1);
+    return emitSelectBuiltinCalls(*this, E, {X, Y, Z}, Default);
+  }
+  case Builtin::BI__builtin_get_local_size: {
+    Value *X, *Y, *Z;
+    if (getTarget().getTriple().getArch() == Triple::amdgcn) {
+    //TODO: Switch these to amdgcn when available
+      X = CGM.getIntrinsic(Intrinsic::r600_read_local_size_x);
+      Y = CGM.getIntrinsic(Intrinsic::r600_read_local_size_y);
+      Z = CGM.getIntrinsic(Intrinsic::r600_read_local_size_z);
+    } else {
+      X = CGM.getIntrinsic(Intrinsic::r600_read_local_size_x);
+      Y = CGM.getIntrinsic(Intrinsic::r600_read_local_size_y);
+      Z = CGM.getIntrinsic(Intrinsic::r600_read_local_size_z);
+    }
+    Value *Default = ConstantInt::get(llvm::Type::getInt32Ty(Builder.getContext()), 1);
+    return emitSelectBuiltinCalls(*this, E, {X, Y, Z}, Default);
+  }
+  case Builtin::BI__builtin_get_group_id: {
+    Value *X, *Y, *Z;
+    if (getTarget().getTriple().getArch() == Triple::amdgcn) {
+    //TODO: Switch these to amdgcn when available
+      X = CGM.getIntrinsic(Intrinsic::amdgcn_workgroup_id_x);
+      Y = CGM.getIntrinsic(Intrinsic::amdgcn_workgroup_id_y);
+      Z = CGM.getIntrinsic(Intrinsic::amdgcn_workgroup_id_z);
+    } else {
+      X = CGM.getIntrinsic(Intrinsic::r600_read_tgid_x);
+      Y = CGM.getIntrinsic(Intrinsic::r600_read_tgid_y);
+      Z = CGM.getIntrinsic(Intrinsic::r600_read_tgid_z);
+    }
+    Value *Default = ConstantInt::get(llvm::Type::getInt32Ty(Builder.getContext()), 0);
+    return emitSelectBuiltinCalls(*this, E, {X, Y, Z}, Default);
+  }
+  case Builtin::BI__builtin_get_local_id: {
+    Value *X, *Y, *Z;
+    if (getTarget().getTriple().getArch() == Triple::amdgcn) {
+    //TODO: Switch these to amdgcn when available
+      X = CGM.getIntrinsic(Intrinsic::amdgcn_workitem_id_x);
+      Y = CGM.getIntrinsic(Intrinsic::amdgcn_workitem_id_y);
+      Z = CGM.getIntrinsic(Intrinsic::amdgcn_workitem_id_z);
+    } else {
+      X = CGM.getIntrinsic(Intrinsic::r600_read_tidig_x);
+      Y = CGM.getIntrinsic(Intrinsic::r600_read_tidig_y);
+      Z = CGM.getIntrinsic(Intrinsic::r600_read_tidig_z);
+    }
+    Value *Default = ConstantInt::get(llvm::Type::getInt32Ty(Builder.getContext()), 0);
+    return emitSelectBuiltinCalls(*this, E, {X, Y, Z}, Default);
   }
   default:
     return nullptr;
