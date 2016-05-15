@@ -13,6 +13,65 @@
 //===----------------------------------------------------------------------===//
 
 // The format of this database matches clang/Basic/Builtins.def.
+//===----------------------------------------------------------------------===//
+// R600+ only builtins.
+//===----------------------------------------------------------------------===//
+
+BUILTIN(__builtin_r600_read_workdim, "Ui", "nc")
+
+BUILTIN(__builtin_r600_read_ngroups_x, "Ui", "nc")
+BUILTIN(__builtin_r600_read_ngroups_y, "Ui", "nc")
+BUILTIN(__builtin_r600_read_ngroups_z, "Ui", "nc")
+
+BUILTIN(__builtin_r600_read_global_size_x, "Ui", "nc")
+BUILTIN(__builtin_r600_read_global_size_y, "Ui", "nc")
+BUILTIN(__builtin_r600_read_global_size_z, "Ui", "nc")
+
+BUILTIN(__builtin_r600_read_local_size_x, "Ui", "nc")
+BUILTIN(__builtin_r600_read_local_size_y, "Ui", "nc")
+BUILTIN(__builtin_r600_read_local_size_z, "Ui", "nc")
+
+BUILTIN(__builtin_r600_read_tgid_x, "Ui", "nc")
+BUILTIN(__builtin_r600_read_tgid_y, "Ui", "nc")
+BUILTIN(__builtin_r600_read_tgid_z, "Ui", "nc")
+
+BUILTIN(__builtin_r600_read_tidig_x, "Ui", "nc")
+BUILTIN(__builtin_r600_read_tidig_y, "Ui", "nc")
+BUILTIN(__builtin_r600_read_tidig_z, "Ui", "nc")
+
+BUILTIN(__builtin_r600_read_global_offset_x, "Ui", "nc")
+BUILTIN(__builtin_r600_read_global_offset_y, "Ui", "nc")
+BUILTIN(__builtin_r600_read_global_offset_z, "Ui", "nc")
+
+//===----------------------------------------------------------------------===//
+// SI+ only builtins.
+//===----------------------------------------------------------------------===//
+
+BUILTIN(__builtin_amdgcn_read_workdim, "Ui", "nc")
+
+BUILTIN(__builtin_amdgcn_ngroups_x, "Ui", "nc")
+BUILTIN(__builtin_amdgcn_ngroups_y, "Ui", "nc")
+BUILTIN(__builtin_amdgcn_ngroups_z, "Ui", "nc")
+
+BUILTIN(__builtin_amdgcn_global_size_x, "Ui", "nc")
+BUILTIN(__builtin_amdgcn_global_size_y, "Ui", "nc")
+BUILTIN(__builtin_amdgcn_global_size_z, "Ui", "nc")
+
+BUILTIN(__builtin_amdgcn_local_size_x, "Ui", "nc")
+BUILTIN(__builtin_amdgcn_local_size_y, "Ui", "nc")
+BUILTIN(__builtin_amdgcn_local_size_z, "Ui", "nc")
+
+BUILTIN(__builtin_amdgcn_workgroup_id_x, "Ui", "nc")
+BUILTIN(__builtin_amdgcn_workgroup_id_y, "Ui", "nc")
+BUILTIN(__builtin_amdgcn_workgroup_id_z, "Ui", "nc")
+
+BUILTIN(__builtin_amdgcn_workitem_id_x, "Ui", "nc")
+BUILTIN(__builtin_amdgcn_workitem_id_y, "Ui", "nc")
+BUILTIN(__builtin_amdgcn_workitem_id_z, "Ui", "nc")
+
+BUILTIN(__builtin_amdgcn_global_offset_x, "Ui", "nc")
+BUILTIN(__builtin_amdgcn_global_offset_y, "Ui", "nc")
+BUILTIN(__builtin_amdgcn_global_offset_z, "Ui", "nc")
 
 BUILTIN(__builtin_amdgcn_s_barrier, "v", "n")
 BUILTIN(__builtin_amdgcn_div_scale, "dddbb*", "n")

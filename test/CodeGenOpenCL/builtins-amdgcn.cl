@@ -275,3 +275,94 @@ void test_legacy_ldexp_f64(global double* out, double a, int b)
 {
   *out = __builtin_amdgpu_ldexp(a, b);
 }
+
+// CHECK-LABEL: @test_get_work_dim(
+// CHECK: tail call i32 @llvm.amdgcn.read.workdim()
+void test_get_work_dim(global int* out)
+{
+  *out = __builtin_amdgcn_read_workdim();
+}
+
+// CHECK-LABEL: @test_get_num_groups(
+// CHECK: tail call i32 @llvm.amdgcn.ngroups.x()
+// CHECK: tail call i32 @llvm.amdgcn.ngroups.y()
+// CHECK: tail call i32 @llvm.amdgcn.ngroups.z()
+void test_get_num_groups(int d, global int *out)
+{
+	switch (d) {
+	case 0: *out = __builtin_amdgcn_ngroups_x(); break;
+	case 1: *out = __builtin_amdgcn_ngroups_y(); break;
+	case 2: *out = __builtin_amdgcn_ngroups_z(); break;
+	default: *out = 1;
+	}
+}
+
+// CHECK-LABEL: @test_get_global_size(
+// CHECK: tail call i32 @llvm.amdgcn.global.size.x()
+// CHECK: tail call i32 @llvm.amdgcn.global.size.y()
+// CHECK: tail call i32 @llvm.amdgcn.global.size.z()
+void test_get_global_size(int d, global int *out)
+{
+	switch (d) {
+	case 0: *out = __builtin_amdgcn_global_size_x(); break;
+	case 1: *out = __builtin_amdgcn_global_size_y(); break;
+	case 2: *out = __builtin_amdgcn_global_size_z(); break;
+	default: *out = 1;
+	}
+}
+
+// CHECK-LABEL: @test_get_local_size(
+// CHECK: tail call i32 @llvm.amdgcn.local.size.x()
+// CHECK: tail call i32 @llvm.amdgcn.local.size.y()
+// CHECK: tail call i32 @llvm.amdgcn.local.size.z()
+void test_get_local_size(int d, global int * out)
+{
+	switch (d) {
+	case 0: *out = __builtin_amdgcn_local_size_x(); break;
+	case 1: *out = __builtin_amdgcn_local_size_y(); break;
+	case 2: *out = __builtin_amdgcn_local_size_z(); break;
+	default: *out = 1;
+	}
+}
+
+// CHECK-LABEL: @test_get_group_id(
+// CHECK: tail call i32 @llvm.amdgcn.workgroup.id.x()
+// CHECK: tail call i32 @llvm.amdgcn.workgroup.id.y()
+// CHECK: tail call i32 @llvm.amdgcn.workgroup.id.z()
+void test_get_group_id(int d, global int *out)
+{
+	switch (d) {
+	case 0: *out = __builtin_amdgcn_workgroup_id_x(); break;
+	case 1: *out = __builtin_amdgcn_workgroup_id_y(); break;
+	case 2: *out = __builtin_amdgcn_workgroup_id_z(); break;
+	default: *out = 0;
+	}
+}
+
+// CHECK-LABEL: @test_get_local_id(
+// CHECK: tail call i32 @llvm.amdgcn.workitem.id.x()
+// CHECK: tail call i32 @llvm.amdgcn.workitem.id.y()
+// CHECK: tail call i32 @llvm.amdgcn.workitem.id.z()
+void test_get_local_id(int d, global int *out)
+{
+	switch (d) {
+	case 0: *out = __builtin_amdgcn_workitem_id_x(); break;
+	case 1: *out = __builtin_amdgcn_workitem_id_y(); break;
+	case 2: *out = __builtin_amdgcn_workitem_id_z(); break;
+	default: *out = 0;
+	}
+}
+
+// CHECK-LABEL: @test_get_global_offset(
+// CHECK: tail call i32 @llvm.amdgcn.global.offset.x()
+// CHECK: tail call i32 @llvm.amdgcn.global.offset.y()
+// CHECK: tail call i32 @llvm.amdgcn.global.offset.z()
+void test_get_global_offset(int d, global int *out)
+{
+	switch (d) {
+	case 0: *out = __builtin_amdgcn_global_offset_x(); break;
+	case 1: *out = __builtin_amdgcn_global_offset_y(); break;
+	case 2: *out = __builtin_amdgcn_global_offset_z(); break;
+	default: *out = 1;
+	}
+}
