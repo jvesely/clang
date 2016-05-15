@@ -1280,6 +1280,17 @@ BUILTIN(__builtin___get_unsafe_stack_ptr, "v*", "Fn")
 BUILTIN(__builtin_nontemporal_store, "v.", "t")
 BUILTIN(__builtin_nontemporal_load, "v.", "t")
 
+// OpenCL v1.0 common builtins
+LANGBUILTIN(__builtin_get_work_dim, "Ui", "nc", OCLC_LANG)
+LANGBUILTIN(__builtin_get_num_groups, "UiUi", "nc", OCLC_LANG)
+LANGBUILTIN(__builtin_get_global_size, "UiUi", "nc", OCLC_LANG)
+LANGBUILTIN(__builtin_get_local_size, "UiUi", "nc", OCLC_LANG)
+LANGBUILTIN(__builtin_get_group_id, "UiUi", "nc", OCLC_LANG)
+LANGBUILTIN(__builtin_get_local_id, "UiUi", "nc", OCLC_LANG)
+
+// OpenCL v1.1 common builtins
+LANGBUILTIN(__builtin_get_global_offset, "Ui", "nc", OCLC_LANG)
+
 // OpenCL v2.0 s6.13.16, s9.17.3.5 - Pipe functions.
 // We need the generic prototype, since the packet type could be anything.
 LANGBUILTIN(read_pipe, "i.", "tn", OCLC_LANG)
