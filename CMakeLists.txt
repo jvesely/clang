@@ -458,6 +458,10 @@ add_definitions( -D_GNU_SOURCE )
 option(CLANG_BUILD_TOOLS
   "Build the Clang tools. If OFF, just generate build targets." ON)
 
+if (UNIX)
+  option(CLANG_ENABLE_SHLIB "Build combined clang dynamic library." ON)
+endif()
+
 option(CLANG_ENABLE_ARCMT "Build ARCMT." ON)
 option(CLANG_ENABLE_STATIC_ANALYZER "Build static analyzer." ON)
 

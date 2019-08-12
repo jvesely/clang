@@ -15,7 +15,7 @@ add_clang_subdirectory(c-index-test)
 
 add_clang_subdirectory(clang-rename)
 add_clang_subdirectory(clang-refactor)
-if(UNIX)
+if(UNIX AND CLANG_ENABLE_SHLIB)
   add_clang_subdirectory(clang-shlib)
 endif()
 
